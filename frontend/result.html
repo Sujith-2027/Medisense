@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MediSense — Your Results</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#0b0f1a;--sur:#131929;--sur2:#1a2235;--bdr:rgba(255,255,255,0.07);--acc:#4fc8ff;--acc2:#7b5ea7;--tx:#e8edf5;--mu:#7a8499;--hi:#ef4444;--me:#f97316;--mi:#22c55e}
+    body{background:var(--bg);color:var(--tx);font-family:'DM Sans',sans-serif;min-height:100vh}
+    /* NAV */
+    nav{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;border-bottom:1px solid var(--bdr);position:sticky;top:0;z-index:50;backdrop-filter:blur(12px);background:rgba(11,15,26,0.85)}
+    .logo{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--acc);text-decoration:none;flex-shrink:0}
+    .logo span{color:var(--tx)}
+    .nav-links{display:flex;gap:6px;flex-wrap:wrap}
+    .nb{padding:6px 13px;border-radius:999px;font-size:0.78rem;font-weight:500;cursor:pointer;text-decoration:none;border:none;font-family:'DM Sans',sans-serif;transition:all 0.2s;white-space:nowrap}
+    .nb-ghost{background:transparent;border:1px solid var(--bdr);color:var(--mu)}.nb-ghost:hover{border-color:var(--acc);color:var(--acc)}
+    /* Report ID top-right corner */
+    .rid-corner{position:fixed;top:68px;right:16px;background:rgba(79,200,255,0.1);border:1px solid rgba(79,200,255,0.2);border-radius:10px;padding:7px 14px;text-align:right;z-index:40;font-size:0.75rem}
+    .rid-val{color:var(--acc);font-weight:600;letter-spacing:1px}
+    .rid-lbl{color:var(--mu);font-size:0.68rem;margin-top:1px}
+    @media(max-width:480px){.rid-corner{top:auto;bottom:80px;right:12px}}
+    /* PAGE */
+    .page{max-width:760px;margin:0 auto;padding:24px 16px 100px;display:flex;flex-direction:column;gap:14px}
+    .fade{animation:up 0.5s ease both}
+    @keyframes up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+    /* Header card */
+    .hcard{background:var(--sur);border:1px solid var(--bdr);border-radius:18px;padding:20px 24px}
+    .hcard h2{font-family:'Playfair Display',serif;font-size:1.4rem;margin-bottom:4px}
+    .hcard .meta{color:var(--mu);font-size:0.82rem;line-height:1.7}
+    /* Severity */
+    .alert{border-radius:13px;padding:14px 18px;display:flex;align-items:flex-start;gap:12px}
+    .alert.high{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.28)}
+    .alert.medium{background:rgba(249,115,22,0.1);border:1px solid rgba(249,115,22,0.28)}
+    .alert.mild{background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.28)}
+    .ai{font-size:1.35rem;flex-shrink:0;margin-top:1px}
+    .ab strong{display:block;font-size:0.93rem;margin-bottom:3px}
+    .ab p{font-size:0.82rem;opacity:0.85;line-height:1.5}
+    .alert.high .ab strong{color:var(--hi)}.alert.medium .ab strong{color:var(--me)}.alert.mild .ab strong{color:var(--mi)}
+    /* Cards */
+    .card{background:var(--sur);border:1px solid var(--bdr);border-radius:15px;padding:18px 22px}
+    .clbl{font-size:0.69rem;letter-spacing:1.7px;text-transform:uppercase;color:var(--mu);margin-bottom:12px}
+    /* Conditions with tubes */
+    .cond-list{display:flex;flex-direction:column;gap:9px}
+    .cond-item{display:flex;align-items:center;gap:10px;flex-wrap:nowrap}
+    .crank{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.66rem;font-weight:700;flex-shrink:0}
+    .rk1{background:rgba(251,191,36,0.15);color:#fbbf24}.rk2{background:rgba(148,163,184,0.15);color:#94a3b8}.rk3{background:rgba(180,120,60,0.15);color:#b4783c}.rkn{background:var(--sur2);color:var(--mu)}
+    .cname{font-size:0.86rem;min-width:120px;max-width:180px;flex-shrink:0}
+    @media(max-width:400px){.cname{min-width:90px;font-size:0.8rem}}
+    .tube{flex:1;height:8px;background:var(--sur2);border-radius:999px;overflow:hidden;min-width:60px}
+    .tubef{height:100%;border-radius:999px;transition:width 1.2s cubic-bezier(0.4,0,0.2,1)}
+    .tf1{background:linear-gradient(90deg,#4fc8ff,#7b5ea7)}.tf2{background:linear-gradient(90deg,#7b5ea7,#c4a8f0)}.tf3{background:linear-gradient(90deg,#f97316,#fbbf24)}.tfn{background:rgba(255,255,255,0.13)}
+    .cpct{font-size:0.78rem;color:var(--acc);min-width:34px;text-align:right;font-weight:500}
+    /* Explanation */
+    .expl{color:#c8d0e0;line-height:1.85;font-size:0.9rem;font-weight:300}
+    .expl strong{color:var(--tx);font-weight:500;background:rgba(79,200,255,0.09);padding:1px 5px;border-radius:4px}
+    /* Warning */
+    .wcard{background:var(--sur);border:1px solid rgba(239,68,68,0.22);border-radius:15px;padding:18px 22px}
+    .wi{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--bdr);align-items:flex-start}
+    .wi:last-child{border-bottom:none;padding-bottom:0}
+    .wico{font-size:0.82rem;flex-shrink:0;margin-top:2px}
+    .wtx{font-size:0.85rem;color:#f8a0a0;line-height:1.55}
+    /* Advice */
+    .adi{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--bdr);align-items:flex-start}
+    .adi:last-child{border-bottom:none;padding-bottom:0}
+    .anum{width:22px;height:22px;border-radius:50%;background:rgba(79,200,255,0.1);border:1px solid rgba(79,200,255,0.2);color:var(--acc);font-size:0.68rem;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+    .atx{font-size:0.86rem;color:#c8d0e0;line-height:1.55}
+    .atx strong{color:var(--acc);font-weight:500}
+    /* OTC medicines */
+    .otc-grid{display:flex;flex-wrap:wrap;gap:9px}
+    .opill{background:var(--sur2);border:1px solid var(--bdr);border-radius:10px;padding:9px 14px;font-size:0.82rem;color:#ffb347;cursor:pointer;transition:all 0.2s;display:flex;align-items:flex-start;gap:7px;font-family:'DM Sans',sans-serif;text-align:left}
+    .opill:hover{border-color:#ffb347;background:rgba(255,179,71,0.07);transform:translateY(-1px)}
+    .opname{display:block;font-weight:500}
+    .ophint{display:block;font-size:0.7rem;color:var(--mu);margin-top:1px}
+    /* Actions */
+    .actions{display:flex;gap:10px;flex-wrap:wrap}
+    .btn{flex:1;min-width:130px;padding:13px 16px;border-radius:999px;border:none;font-family:'DM Sans',sans-serif;font-size:0.87rem;font-weight:500;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s;text-align:center;text-decoration:none}
+    .btn-p{background:var(--acc);color:#0b0f1a;box-shadow:0 0 26px rgba(79,200,255,0.16)}.btn-p:hover{transform:translateY(-2px);box-shadow:0 0 44px rgba(79,200,255,0.32)}
+    .btn-o{background:transparent;color:var(--tx);border:1px solid var(--bdr)}.btn-o:hover{border-color:var(--acc);color:var(--acc)}
+    /* Medicine modal */
+    .moverlay{position:fixed;inset:0;background:rgba(0,0,0,0.78);z-index:300;display:none;align-items:center;justify-content:center;padding:16px}
+    .moverlay.open{display:flex}
+    .mmodal{background:var(--sur);border:1px solid var(--bdr);border-radius:18px;padding:26px;max-width:440px;width:100%;animation:up 0.3s ease}
+    .mmodal h3{font-family:'Playfair Display',serif;font-size:1.2rem;margin-bottom:12px;color:#ffb347}
+    .mmodal p{color:#c8d0e0;font-size:0.88rem;line-height:1.75;font-weight:300}
+    .mclose{float:right;background:none;border:none;color:var(--mu);cursor:pointer;font-size:1.2rem;margin-top:-2px}
+    /* Chat */
+    .chat-notice{background:rgba(79,200,255,0.05);border:1px solid rgba(79,200,255,0.12);border-radius:9px;padding:10px 13px;font-size:0.78rem;color:var(--mu);margin-bottom:12px;line-height:1.5}
+    .chat-notice strong{color:var(--acc)}
+    .clbl2{font-family:'Playfair Display',serif;font-size:1.1rem;margin-bottom:6px}
+    .cmsgs{display:flex;flex-direction:column;gap:10px;margin-bottom:12px;max-height:340px;overflow-y:auto}
+    .bub{border-radius:13px;padding:12px 16px;font-size:0.86rem;line-height:1.75;font-weight:300}
+    .bub.q{background:rgba(79,200,255,0.07);border:1px solid rgba(79,200,255,0.13)}
+    .bub.q .bl{color:var(--acc);font-size:0.7rem;font-weight:500;margin-bottom:4px}
+    .bub.a{background:var(--sur2);border:1px solid var(--bdr);color:#c8d0e0}
+    .bub.a .bl{color:var(--mu);font-size:0.7rem;margin-bottom:4px}
+    .cinrow{display:flex;gap:8px}
+    .cinrow input{flex:1;background:var(--sur2);border:1px solid var(--bdr);color:var(--tx);font-family:'DM Sans',sans-serif;border-radius:999px;padding:11px 18px;font-size:0.87rem;outline:none;transition:border-color 0.2s;min-width:0}
+    .cinrow input:focus{border-color:var(--acc)}
+    .cinrow button{background:var(--acc);color:#0b0f1a;border:none;border-radius:999px;padding:11px 20px;font-weight:600;cursor:pointer;font-size:0.87rem;white-space:nowrap;font-family:'DM Sans',sans-serif;flex-shrink:0}
+    .cinrow button:disabled{opacity:0.5;cursor:not-allowed}
+    .qqs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+    .qq{background:var(--sur2);border:1px solid var(--bdr);border-radius:999px;padding:4px 11px;font-size:0.74rem;color:var(--mu);cursor:pointer;transition:all 0.2s}
+    .qq:hover{border-color:var(--acc);color:var(--acc)}
+    @media(max-width:480px){.actions{gap:8px}.btn{min-width:100px;font-size:0.8rem;padding:11px 12px}}
+  </style>
+</head>
+<body>
+  <!-- Medicine modal -->
+  <div class="moverlay" id="mmod">
+    <div class="mmodal">
+      <button class="mclose" onclick="closeMed()">✕</button>
+      <h3 id="mname">Medicine</h3>
+      <p id="mbody" style="color:var(--mu);font-style:italic">Loading...</p>
+    </div>
+  </div>
+
+  <nav>
+    <a class="logo" href="index.html">Medi<span>Sense</span></a>
+    <div class="nav-links">
+      <a class="nb nb-ghost" href="index.html">🏠 Home</a>
+      <a class="nb nb-ghost" href="upload.html">🔄 New</a>
+      <a class="nb nb-ghost" href="dashboard.html">📊 Stats</a>
+    </div>
+  </nav>
+
+  <!-- Report ID in corner -->
+  <div class="rid-corner" id="ridcorner" style="display:none">
+    <div class="rid-val" id="ridval"></div>
+    <div class="rid-lbl">Report ID</div>
+  </div>
+
+  <div class="page" id="page"></div>
+
+  <script>
+    const r=JSON.parse(sessionStorage.getItem("analysisResult")||"{}");
+    if(!r.report_id){window.location.href="upload.html"}
+
+    // Show report ID in corner
+    document.getElementById("ridval").textContent="#"+r.report_id;
+    document.getElementById("ridcorner").style.display="block";
+
+    let chatHistory=[];
+    const page=document.getElementById("page");
+
+    function hl(t){return(t||"").replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>")}
+    function addCard(html,delay,cls="card"){
+      const c=document.createElement("div");c.className=cls+" fade";c.style.animationDelay=delay+"s";c.innerHTML=html;page.appendChild(c);return c;
+    }
+
+    // Header
+    const hc=document.createElement("div");hc.className="hcard fade";hc.style.animationDelay="0s";
+    hc.innerHTML=`<h2>Hello, ${r.name} 👋</h2>
+      <div class="meta">${[r.age?"Age "+r.age:"",r.gender].filter(Boolean).join(" · ")}${r.medical_history?"<br/>History: "+r.medical_history:""}${r.allergies?"<br/>Allergies: "+r.allergies:""}</div>`;
+    page.appendChild(hc);
+
+    // Severity
+    const sev=r.severity||"medium";
+    const sm={high:{i:"🚨",t:"High-risk symptoms",m:"Seek immediate medical attention. Call emergency services if needed."},medium:{i:"⚠️",t:"Moderate symptoms",m:"Monitor closely. Visit a doctor if symptoms worsen or persist beyond 24–48 hours."},mild:{i:"✅",t:"Mild symptoms",m:"Rest and hydrate. See a doctor if symptoms persist beyond 3–5 days."}};
+    const sv=sm[sev];
+    const sa=document.createElement("div");sa.className=`alert ${sev} fade`;sa.style.animationDelay="0.05s";
+    sa.innerHTML=`<div class="ai">${sv.i}</div><div class="ab"><strong>${sv.t}</strong><p>${sv.m}</p></div>`;
+    page.appendChild(sa);
+
+    // Conditions with tubes
+    const conds=r.possible_conditions||[];
+    if(conds.length){
+      const pcts=[75,52,34,20,12];
+      const tfc=["tf1","tf2","tf3","tfn","tfn"];
+      const rkc=["rk1","rk2","rk3","rkn","rkn"];
+      let ch=`<div class="clbl">Possible Conditions</div><div class="cond-list">`;
+      conds.slice(0,5).forEach((c,i)=>{
+        const p=pcts[i]||10;
+        ch+=`<div class="cond-item"><div class="crank ${rkc[i]}">#${i+1}</div><div class="cname">${c}</div><div class="tube"><div class="tubef ${tfc[i]}" style="width:0" data-w="${p}%"></div></div><div class="cpct">${p}%</div></div>`;
+      });
+      ch+=`</div><div style="font-size:0.7rem;color:var(--mu);margin-top:8px">* Relative likelihood based on symptom match — not clinical diagnosis.</div>`;
+      addCard(ch,0.1);
+      setTimeout(()=>document.querySelectorAll(".tubef[data-w]").forEach(e=>e.style.width=e.dataset.w),200);
+    }
+
+    // Explanation - must be detailed
+    if(r.explanation){
+      addCard(`<div class="clbl">AI Explanation</div><p class="expl">${hl(r.explanation)}</p>`,0.15);
+    }
+
+    // Warnings
+    const warns=r.warning||[];
+    if(warns.length&&warns.some(w=>w&&w.length>2)){
+      const wc=document.createElement("div");wc.className="wcard fade";wc.style.animationDelay="0.2s";
+      let wh=`<div class="clbl" style="color:#ef4444">⚠ Warnings</div>`;
+      warns.filter(w=>w&&w.length>2).forEach(w=>{wh+=`<div class="wi"><div class="wico">🔴</div><div class="wtx">${hl(w)}</div></div>`});
+      wc.innerHTML=wh;page.appendChild(wc);
+    }
+
+    // Advice - minimum 3 points
+    const advice=r.advice||[];
+    if(advice.length){
+      let ah=`<div class="clbl">Advice</div>`;
+      advice.slice(0,6).forEach((a,i)=>{ah+=`<div class="adi"><div class="anum">${i+1}</div><div class="atx">${hl(a)}</div></div>`});
+      addCard(ah,0.25);
+    }
+
+    // OTC medicines - minimum 3
+    const otc=r.otc||[];
+    if(otc.length){
+      let oh=`<div class="clbl">OTC Medicines <span style="font-size:0.67rem;color:var(--mu);text-transform:none;letter-spacing:0">(tap to learn more)</span></div><div class="otc-grid">`;
+      otc.slice(0,4).forEach(m=>{
+        const nm=m.split("(")[0].trim();
+        const hint=m.includes("(")?m.match(/\(([^)]+)\)/)?.[1]:"Tap to learn more";
+        oh+=`<button class="opill" onclick="openMed('${nm.replace(/'/g,"\\'")}')"><span style="font-size:0.88rem;flex-shrink:0">💊</span><span><span class="opname">${nm}</span><span class="ophint">${hint||"Tap to learn more"}</span></span></button>`;
+      });
+      oh+=`</div>`;addCard(oh,0.3);
+    }
+
+    // Actions
+    const ac=document.createElement("div");ac.className="actions fade";ac.style.animationDelay="0.35s";
+    ac.innerHTML=`<button class="btn btn-p" onclick="window.open('/api/report/${r.report_id}','_blank')">⬇ Download PDF</button>
+      <button class="btn btn-o" onclick="window.location.href='upload.html'">🔄 New Analysis</button>
+      <button class="btn btn-o" onclick="window.location.href='dashboard.html'">📊 Dashboard</button>`;
+    page.appendChild(ac);
+
+    // Follow-up chat
+    const fc=document.createElement("div");fc.className="card fade";fc.style.animationDelay="0.4s";
+    fc.innerHTML=`<div class="clbl2">💬 Ask a follow-up</div>
+      <div class="chat-notice"><strong>I can help with:</strong> explaining conditions & types, which specialist to visit, real hospital names nearby, medicines.<br/><strong>I cannot:</strong> book appointments, access live systems, or prescribe medication.</div>
+      <div class="qqs" id="qqs"></div>
+      <div class="cmsgs" id="cmsgs"></div>
+      <div class="cinrow"><input id="cin" type="text" placeholder="e.g. Which hospitals nearby should I visit?"/><button id="cbtn" onclick="sendQ()">Ask</button></div>`;
+    page.appendChild(fc);
+
+    ["What type of doctor should I see?","Are there different types of this disease?","Which hospitals are nearby?","What does this medicine do?","How long does recovery take?","Is this contagious?"].forEach(q=>{
+      const b=document.createElement("span");b.className="qq";b.textContent=q;
+      b.onclick=()=>{document.getElementById("cin").value=q;sendQ()};
+      document.getElementById("qqs").appendChild(b);
+    });
+    document.getElementById("cin").addEventListener("keydown",e=>{if(e.key==="Enter")sendQ()});
+
+    async function sendQ(){
+      const input=document.getElementById("cin"),btn=document.getElementById("cbtn"),q=input.value.trim();
+      if(!q)return;
+      const msgs=document.getElementById("cmsgs");
+      const qb=document.createElement("div");qb.className="bub q";qb.innerHTML=`<div class="bl">You</div>${q}`;
+      msgs.appendChild(qb);msgs.scrollTop=msgs.scrollHeight;
+      input.value="";btn.disabled=true;btn.textContent="...";
+      try{
+        const resp=await fetch("/api/followup",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({report_id:r.report_id,name:r.name,original_symptoms:r.symptoms,question:q,chat_history:chatHistory,user_location:"Mumbai"})}).then(x=>x.json());
+        chatHistory=resp.chat_history||chatHistory;
+        const ab=document.createElement("div");ab.className="bub a";ab.innerHTML=`<div class="bl">MediSense AI</div>${resp.answer}`;
+        msgs.appendChild(ab);msgs.scrollTop=msgs.scrollHeight;
+      }catch{
+        const eb=document.createElement("div");eb.className="bub a";eb.innerHTML=`<div class="bl">Error</div>Could not get a response. Please try again.`;
+        msgs.appendChild(eb);
+      }
+      btn.disabled=false;btn.textContent="Ask";
+    }
+
+    async function openMed(name){
+      document.getElementById("mname").textContent="💊 "+name;
+      document.getElementById("mbody").textContent="Loading explanation...";
+      document.getElementById("mbody").style.fontStyle="italic";
+      document.getElementById("mbody").style.color="var(--mu)";
+      document.getElementById("mmod").classList.add("open");
+      try{
+        const resp=await fetch("/api/explain-medicine",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({medicine:name})}).then(x=>x.json());
+        document.getElementById("mbody").textContent=resp.explanation;
+        document.getElementById("mbody").style.fontStyle="normal";
+        document.getElementById("mbody").style.color="#c8d0e0";
+      }catch{document.getElementById("mbody").textContent="Could not load. Please try again."}
+    }
+    function closeMed(){document.getElementById("mmod").classList.remove("open")}
+    document.getElementById("mmod").addEventListener("click",e=>{if(e.target===document.getElementById("mmod"))closeMed()});
+  </script>
+</body>
+</html>

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MediSense AI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#0b0f1a;--sur:#131929;--sur2:#1a2235;--bdr:rgba(255,255,255,0.07);--acc:#4fc8ff;--acc2:#7b5ea7;--tx:#e8edf5;--mu:#7a8499;--ok:#22c55e;--er:#ef4444}
+    body{background:var(--bg);color:var(--tx);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden}
+    .orb{position:fixed;border-radius:50%;filter:blur(100px);opacity:0.15;pointer-events:none}
+    .orb1{width:400px;height:400px;background:var(--acc);top:-80px;left:-80px;animation:drift 12s ease-in-out infinite alternate}
+    .orb2{width:350px;height:350px;background:var(--acc2);bottom:-60px;right:-60px;animation:drift 12s 6s ease-in-out infinite alternate}
+    @keyframes drift{to{transform:translate(25px,20px)}}
+    /* NAV */
+    nav{display:flex;justify-content:space-between;align-items:center;padding:16px 24px;border-bottom:1px solid var(--bdr);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100;background:rgba(11,15,26,0.85)}
+    .logo{font-family:'Playfair Display',serif;font-size:1.25rem;color:var(--acc);text-decoration:none;flex-shrink:0}
+    .logo span{color:var(--tx)}
+    .nav-links{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .nb{padding:7px 16px;border-radius:999px;font-size:0.83rem;font-weight:500;cursor:pointer;text-decoration:none;border:none;font-family:'DM Sans',sans-serif;transition:all 0.2s;white-space:nowrap}
+    .nb-ghost{background:transparent;border:1px solid var(--bdr);color:var(--mu)}
+    .nb-ghost:hover{border-color:var(--acc);color:var(--acc)}
+    .nb-solid{background:var(--acc);color:#0b0f1a}
+    .nb-solid:hover{opacity:0.88}
+    /* HERO */
+    .hero{display:flex;flex-direction:column;align-items:center;text-align:center;padding:60px 20px 40px;gap:18px;animation:up 0.7s ease both}
+    @keyframes up{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+    .badge{display:inline-flex;align-items:center;gap:6px;background:rgba(79,200,255,0.1);border:1px solid rgba(79,200,255,0.22);color:var(--acc);font-size:0.72rem;letter-spacing:1.4px;text-transform:uppercase;padding:5px 14px;border-radius:999px}
+    h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,6vw,3.8rem);line-height:1.12;max-width:640px}
+    h1 em{color:var(--acc);font-style:normal}
+    .sub{color:var(--mu);font-size:0.97rem;max-width:460px;line-height:1.75;font-weight:300}
+    .hero-btns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:4px}
+    .cta-p{display:inline-block;background:var(--acc);color:#0b0f1a;font-weight:600;padding:13px 36px;border-radius:999px;text-decoration:none;font-size:0.95rem;transition:transform 0.2s,box-shadow 0.2s;box-shadow:0 0 36px rgba(79,200,255,0.2)}
+    .cta-p:hover{transform:translateY(-2px);box-shadow:0 0 56px rgba(79,200,255,0.38)}
+    .cta-s{display:inline-block;background:transparent;color:var(--tx);font-weight:500;padding:13px 26px;border-radius:999px;text-decoration:none;font-size:0.95rem;border:1px solid var(--bdr);transition:all 0.2s}
+    .cta-s:hover{border-color:var(--acc2);color:var(--acc2)}
+    /* LOOKUP */
+    .lookup{max-width:520px;margin:0 auto 44px;padding:0 20px;animation:up 0.7s 0.1s ease both}
+    .lcard{background:var(--sur);border:1px solid var(--bdr);border-radius:18px;padding:24px 26px}
+    .lcard h3{font-family:'Playfair Display',serif;font-size:1.1rem;margin-bottom:5px}
+    .lcard p{color:var(--mu);font-size:0.82rem;margin-bottom:16px;font-weight:300}
+    .lrow{display:flex;gap:8px}
+    .lrow input{flex:1;background:var(--sur2);border:1px solid var(--bdr);color:var(--tx);font-family:'DM Sans',sans-serif;border-radius:10px;padding:11px 14px;font-size:0.9rem;outline:none;text-transform:uppercase;letter-spacing:1px;transition:border-color 0.2s;min-width:0}
+    .lrow input:focus{border-color:var(--acc)}
+    .lrow input::placeholder{text-transform:none;letter-spacing:0}
+    .lbtn{background:var(--acc2);color:#fff;border:none;border-radius:10px;padding:11px 20px;font-weight:600;cursor:pointer;font-size:0.88rem;white-space:nowrap;font-family:'DM Sans',sans-serif;transition:opacity 0.2s;flex-shrink:0}
+    .lbtn:hover{opacity:0.85}
+    .lresult{margin-top:12px;padding:12px 16px;border-radius:12px;font-size:0.85rem;display:none}
+    .lresult.found{background:rgba(34,197,94,0.07);border:1px solid rgba(34,197,94,0.18)}
+    .lresult.notfound{background:rgba(239,68,68,0.07);border:1px solid rgba(239,68,68,0.2);color:var(--er)}
+    .r-name{font-weight:500;font-size:0.92rem;margin-bottom:3px}
+    .r-meta{color:var(--mu);font-size:0.78rem;margin-bottom:8px}
+    .sev-b{display:inline-block;padding:2px 9px;border-radius:999px;font-size:0.72rem;font-weight:600}
+    .sev-h{background:rgba(239,68,68,0.15);color:#ef4444}.sev-m{background:rgba(249,115,22,0.15);color:#f97316}.sev-l{background:rgba(34,197,94,0.15);color:#22c55e}
+    .vbtn{display:inline-block;margin-top:8px;padding:7px 18px;border-radius:999px;background:var(--acc);color:#0b0f1a;font-weight:600;font-size:0.82rem;text-decoration:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;margin-right:6px}
+    /* HOW */
+    .how{max-width:640px;margin:0 auto 44px;padding:0 20px;animation:up 0.7s 0.15s ease both}
+    .how h2{font-family:'Playfair Display',serif;font-size:1.4rem;text-align:center;margin-bottom:18px}
+    .steps{display:flex;flex-direction:column;gap:10px}
+    .step{display:flex;align-items:flex-start;gap:14px;background:var(--sur);border:1px solid var(--bdr);border-radius:13px;padding:14px 18px}
+    .snum{background:rgba(79,200,255,0.1);border:1px solid rgba(79,200,255,0.2);color:var(--acc);width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.78rem;font-weight:600;flex-shrink:0;margin-top:1px}
+    .step h3{font-size:0.9rem;font-weight:500;margin-bottom:3px}
+    .step p{color:var(--mu);font-size:0.8rem;line-height:1.5;font-weight:300}
+    /* FEATURES */
+    .features{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;max-width:860px;margin:0 auto 44px;padding:0 20px;animation:up 0.7s 0.25s ease both}
+    .features-r{display:none} @media(max-width:580px){.features{grid-template-columns:repeat(2,1fr)}} @media(max-width:360px){.features{grid-template-columns:1fr}} .fcard{background:var(--sur);border:1px solid var(--bdr);border-radius:14px;padding:20px;transition:border-color 0.2s,transform 0.2s}
+    .fcard:hover{border-color:rgba(79,200,255,0.28);transform:translateY(-3px)}
+    .fcard-icon{font-size:1.5rem;margin-bottom:9px}
+    .fcard h3{font-size:0.88rem;font-weight:500;margin-bottom:4px}
+    .fcard p{color:var(--mu);font-size:0.78rem;line-height:1.5;font-weight:300}
+    .disc{text-align:center;color:var(--mu);font-size:0.76rem;padding:18px 20px 40px;border-top:1px solid var(--bdr);margin-top:10px}
+    @media(max-width:480px){nav{padding:12px 16px}.hero{padding:44px 16px 32px}.nb{padding:6px 12px;font-size:0.78rem}}
+  </style>
+</head>
+<body>
+  <div class="orb orb1"></div><div class="orb orb2"></div>
+  <nav>
+    <a class="logo" href="index.html">Medi<span>Sense</span></a>
+    <div class="nav-links">
+      <a class="nb nb-ghost" href="dashboard.html">📊 Dashboard</a>
+      <a class="nb nb-solid" href="upload.html">Analyze →</a>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="badge">🔬 RAG-Powered Medical Assistant</div>
+    <h1>Understand your<br/><em>symptoms</em> better</h1>
+    <p class="sub">Personalized AI symptom analysis grounded in medical knowledge — conditions, severity rating, advice, and a downloadable report.</p>
+    <div class="hero-btns">
+      <a class="cta-p" href="upload.html">Analyze My Symptoms</a>
+      <a class="cta-s" href="dashboard.html">View Dashboard</a>
+    </div>
+  </section>
+
+  <section class="lookup">
+    <div class="lcard">
+      <h3>🔍 Fetch Existing Report</h3>
+      <p>Enter your 8-character report code to view or download it instantly.</p>
+      <div class="lrow">
+        <input id="rcode" type="text" placeholder="e.g. A3F8B2C1" maxlength="8"/>
+        <button class="lbtn" onclick="fetchReport()">Fetch</button>
+      </div>
+      <div class="lresult" id="lresult"></div>
+    </div>
+  </section>
+
+  <section class="how">
+    <h2>How it works</h2>
+    <div class="steps">
+      <div class="step"><div class="snum">1</div><div><h3>Enter your symptoms</h3><p>Name, age, gender, medical history, allergies, and current symptoms.</p></div></div>
+      <div class="step"><div class="snum">2</div><div><h3>RAG retrieves medical knowledge</h3><p>Searches a curated medical knowledge base for the most relevant conditions.</p></div></div>
+      <div class="step"><div class="snum">3</div><div><h3>AI generates your report</h3><p>LLaMA 3.1 via Groq creates a detailed, personalized explanation.</p></div></div>
+      <div class="step"><div class="snum">4</div><div><h3>Download & ask follow-ups</h3><p>PDF report, clickable medicines, and an AI follow-up chat.</p></div></div>
+    </div>
+  </section>
+
+  <section class="features">
+    <div class="fcard"><div class="fcard-icon">🧠</div><h3>RAG-Grounded</h3><p>Grounded in a curated medical knowledge base.</p></div>
+    <div class="fcard"><div class="fcard-icon">🚨</div><h3>Severity Detection</h3><p>HIGH / MEDIUM / MILD classification.</p></div>
+    <div class="fcard"><div class="fcard-icon">💊</div><h3>Medicine Explorer</h3><p>Click any medicine to learn what it does.</p></div>
+    <div class="fcard"><div class="fcard-icon">📄</div><h3>PDF Report</h3><p>Download and share with your doctor.</p></div>
+    <div class="fcard"><div class="fcard-icon">💬</div><h3>Follow-up Chat</h3><p>Ask about diseases, hospitals, specialists.</p></div>
+    <div class="fcard"><div class="fcard-icon">📊</div><h3>Dashboard</h3><p>20+ analytics on trends and disease stats.</p></div>
+  </section>
+
+  <div class="disc">⚠ MediSense is not a substitute for professional medical advice. Always consult a qualified doctor.</div>
+
+  <script>
+    async function fetchReport() {
+      const code = document.getElementById("rcode").value.trim().toUpperCase().replace(/[^A-Z0-9]/g,"");
+      const res  = document.getElementById("lresult");
+      if (code.length < 4) { res.style.display="block"; res.className="lresult notfound"; res.innerHTML="Please enter a valid report code."; return; }
+      res.style.display="block"; res.className="lresult found"; res.innerHTML="Searching...";
+      try {
+        const r = await fetch(`/api/fetch-report/${code}`).then(x => { if(!x.ok) throw new Error("not found"); return x.json(); });
+        const sc = {high:"sev-h",medium:"sev-m",mild:"sev-l"}[r.severity]||"sev-m";
+        const conds = (r.possible_conditions||[]).slice(0,3).join(", ");
+        res.className="lresult found";
+        res.innerHTML=`<div class="r-name">📋 ${r.name}'s Report</div>
+          <div class="r-meta">${r.age?"Age "+r.age:""}${r.age&&r.gender?" · ":""}${r.gender||""} &nbsp;·&nbsp; <span class="sev-b ${sc}">${(r.severity||"medium").toUpperCase()}</span> &nbsp;·&nbsp; ${r.created_at?r.created_at.slice(0,10):""}</div>
+          <div style="font-size:0.79rem;color:#c8d0e0;margin-bottom:6px">${conds||"N/A"}</div>
+          <button class="vbtn" onclick='viewFull(${JSON.stringify(r)})'>View Report</button>
+          <a class="vbtn" style="background:var(--acc2)" href="/api/report/${r.report_id}" target="_blank">⬇ PDF</a>`;
+      } catch {
+        res.className="lresult notfound";
+        res.innerHTML="❌ Report not found. Check the code and try again.";
+      }
+    }
+    function viewFull(data) { sessionStorage.setItem("analysisResult", JSON.stringify(data)); window.location.href="result.html"; }
+    document.getElementById("rcode").addEventListener("keydown", e => { if(e.key==="Enter") fetchReport(); });
+  </script>
+</body>
+</html>

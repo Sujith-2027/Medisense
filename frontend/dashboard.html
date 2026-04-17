@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MediSense — Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#0b0f1a;--sur:#131929;--sur2:#1a2235;--bdr:rgba(255,255,255,0.07);--acc:#4fc8ff;--acc2:#7b5ea7;--tx:#e8edf5;--mu:#7a8499;--hi:#ef4444;--me:#f97316;--mi:#22c55e}
+    body{background:var(--bg);color:var(--tx);font-family:'DM Sans',sans-serif;min-height:100vh}
+    nav{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;border-bottom:1px solid var(--bdr);background:rgba(11,15,26,0.95);position:sticky;top:0;z-index:50}
+    .logo{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--acc);text-decoration:none}
+    .logo span{color:var(--tx)}
+    .nav-links{display:flex;gap:6px;flex-wrap:wrap}
+    .nb{padding:6px 13px;border-radius:999px;font-size:0.78rem;font-weight:500;cursor:pointer;text-decoration:none;border:none;font-family:'DM Sans',sans-serif;transition:all 0.2s;white-space:nowrap}
+    .nb-g{background:transparent;border:1px solid var(--bdr);color:var(--mu)}.nb-g:hover{border-color:var(--acc);color:var(--acc)}
+    .nb-s{background:var(--acc);color:#0b0f1a}.nb-s:hover{opacity:0.88}
+    .page{max-width:1060px;margin:0 auto;padding:24px 16px 70px}
+    .dhero{background:var(--sur);border:1px solid var(--bdr);border-radius:18px;padding:24px 28px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+    .dhero h1{font-family:'Playfair Display',serif;font-size:1.6rem;margin-bottom:3px}
+    .dhero p{color:var(--mu);font-size:0.85rem;font-weight:300}
+    .rbtn{background:var(--acc);color:#0b0f1a;border:none;border-radius:999px;padding:9px 22px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.85rem}
+
+    /* 18 stat cards in 6x3 — symmetric */
+    .sgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:18px}
+    @media(max-width:900px){.sgrid{grid-template-columns:repeat(3,1fr)}}
+    @media(max-width:500px){.sgrid{grid-template-columns:repeat(2,1fr)}}
+    .sc{background:var(--sur);border:1px solid var(--bdr);border-radius:12px;padding:14px 16px}
+    .slbl{font-size:0.65rem;letter-spacing:1.1px;text-transform:uppercase;color:var(--mu);margin-bottom:6px}
+    .sval{font-size:1.6rem;font-weight:500;line-height:1;margin-bottom:3px}
+    .ssub{font-size:0.7rem;color:var(--mu)}
+    .ca{color:var(--acc)}.ch{color:var(--hi)}.cm{color:var(--me)}.cl{color:var(--mi)}.cp{color:#c4a8f0}
+
+    .slabel{font-size:0.68rem;letter-spacing:1.6px;text-transform:uppercase;color:var(--mu);margin-bottom:12px}
+
+    /* Severity bars */
+    .sevbk{background:var(--sur);border:1px solid var(--bdr);border-radius:14px;padding:18px 22px;margin-bottom:16px}
+    .sevrow{display:flex;align-items:center;gap:12px;padding:7px 0}
+    .sevname{font-size:0.8rem;min-width:82px}
+    .sevbw{flex:1;height:9px;background:var(--sur2);border-radius:999px;overflow:hidden}
+    .sevbar{height:100%;border-radius:999px}
+    .sbh{background:var(--hi)}.sbm{background:var(--me)}.sbl{background:var(--mi)}
+    .sevval{font-size:0.77rem;color:var(--mu);min-width:100px;text-align:right}
+
+    /* Chart grid */
+    .cgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+    @media(max-width:580px){.cgrid{grid-template-columns:1fr}}
+    .cc{background:var(--sur);border:1px solid var(--bdr);border-radius:14px;padding:18px 20px}
+    .ccf{background:var(--sur);border:1px solid var(--bdr);border-radius:14px;padding:18px 20px;margin-bottom:14px}
+
+    /* THE FIX: chart containers need explicit px height AND display:block on canvas */
+    .cbox{height:220px;width:100%;position:relative;display:block}
+    .cboxf{height:200px;width:100%;position:relative;display:block}
+    .cbox canvas,.cboxf canvas{position:absolute;top:0;left:0;width:100%!important;height:100%!important}
+
+    /* Disease table */
+    .dtable{background:var(--sur);border:1px solid var(--bdr);border-radius:14px;padding:18px 22px;margin-bottom:16px}
+    .drow{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bdr)}
+    .drow:last-child{border-bottom:none}
+    .drk{width:23px;height:23px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.66rem;font-weight:700;flex-shrink:0}
+    .gld{background:rgba(251,191,36,0.15);color:#fbbf24}.slv{background:rgba(148,163,184,0.15);color:#94a3b8}.brz{background:rgba(180,120,60,0.15);color:#b4783c}.oth{background:var(--sur2);color:var(--mu)}
+    .dn{flex:1;font-size:0.83rem}
+    .dbw{width:120px;height:6px;background:var(--sur2);border-radius:999px;overflow:hidden;flex-shrink:0}
+    @media(max-width:480px){.dbw{display:none}}
+    .dbf{height:100%;border-radius:999px;background:var(--acc)}
+    .dct{font-size:0.76rem;color:var(--mu);min-width:68px;text-align:right}
+    .dpct{font-size:0.74rem;color:var(--acc);min-width:36px;text-align:right;font-weight:500}
+
+    /* 6 insight cards in 3x2 — symmetric */
+    .igrid{display:grid;grid-template-columns:repeat(3,1fr);gap:11px}
+    @media(max-width:680px){.igrid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:420px){.igrid{grid-template-columns:1fr}}
+    .icard{background:var(--sur);border:1px solid var(--bdr);border-radius:13px;padding:16px 18px}
+    .iico{font-size:1.3rem;margin-bottom:7px}
+    .itti{font-size:0.84rem;font-weight:500;margin-bottom:3px}
+    .idsc{font-size:0.76rem;color:var(--mu);line-height:1.5}
+
+    .empty{text-align:center;padding:56px 20px;color:var(--mu)}
+    .empty .big{font-size:2.8rem;margin-bottom:10px}
+  </style>
+</head>
+<body>
+  <nav>
+    <a class="logo" href="index.html">Medi<span>Sense</span></a>
+    <div class="nav-links">
+      <a class="nb nb-s" href="index.html">🏠 Home</a>
+      <a class="nb nb-g" href="upload.html">➕ Analyze</a>
+    </div>
+  </nav>
+
+  <div class="page">
+    <div class="dhero">
+      <div><h1>📊 Analytics Dashboard</h1><p>Live statistics from all symptom analyses on MediSense.</p></div>
+      <button class="rbtn" onclick="load()">↻ Refresh</button>
+    </div>
+    <div id="dash"><div class="empty"><div class="big">⏳</div><p>Loading...</p></div></div>
+  </div>
+
+  <script>
+    // Chart instances registry
+    const CJ = {};
+    function dk(id) { if (CJ[id]) { try { CJ[id].destroy(); } catch(e){} delete CJ[id]; } }
+    function pct(v, t) { return t ? Math.round(v / t * 100) : 0; }
+
+    // Create chart — wait for DOM paint before rendering
+    function mc(id, cfg) {
+      dk(id);
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          const el = document.getElementById(id);
+          if (!el) return;
+          // Force canvas dimensions explicitly
+          const parent = el.parentElement;
+          if (parent) {
+            el.width  = parent.offsetWidth  || 300;
+            el.height = parent.offsetHeight || 220;
+          }
+          try {
+            CJ[id] = new Chart(el, cfg);
+          } catch(e) { console.warn("Chart error", id, e); }
+        });
+      });
+    }
+
+    async function load() {
+      Object.keys(CJ).forEach(dk);
+      document.getElementById("dash").innerHTML = '<div class="empty"><div class="big">⏳</div><p>Loading...</p></div>';
+      try {
+        const s = await fetch("/api/dashboard-stats").then(r => r.json());
+        render(s);
+      } catch(e) {
+        document.getElementById("dash").innerHTML = '<div class="empty"><div class="big">❌</div><p>Could not load stats. Make sure the server is running.</p></div>';
+      }
+    }
+
+    function render(s) {
+      const tot = s.total_reports || 0;
+      const sev = s.severity_count || {};
+      const top = s.top_conditions || [];
+      const mon = s.monthly_trend  || [];
+      const day = s.daily_trend    || [];
+      const cmap= s.condition_count|| {};
+
+      if (!tot) {
+        document.getElementById("dash").innerHTML = '<div class="empty"><div class="big">📋</div><p>No reports yet. <a href="upload.html" style="color:var(--acc)">Analyze symptoms</a> to see stats.</p></div>';
+        return;
+      }
+
+      const hi = sev.high||0, me = sev.medium||0, mi = sev.mild||0;
+      const hp = pct(hi,tot), mp = pct(me,tot), lp = pct(mi,tot);
+      const today = new Date().toISOString().slice(0,10);
+      const tdc   = (day.find(([d]) => d===today)||[,0])[1];
+      const pkd   = day.reduce((a,b) => b[1]>a[1]?b:a, ["—",0]);
+      const pkm   = mon.reduce((a,b) => b[1]>a[1]?b:a, ["—",0]);
+      const avg   = day.length ? (day.reduce((a,b)=>a+b[1],0)/day.length).toFixed(1) : 0;
+      const uq    = Object.keys(cmap).length;
+      const t0    = top[0] || ["N/A",0];
+      const trend = day.length>=2 ? (day.at(-1)[1]>=day.at(-2)[1]?"↑ Rising":"↓ Declining") : "—";
+
+      // Render HTML first
+      document.getElementById("dash").innerHTML = `
+        <!-- 18 stats = 6×3 -->
+        <div class="sgrid">
+          <div class="sc"><div class="slbl">Total Reports</div><div class="sval ca">${tot}</div><div class="ssub">All time</div></div>
+          <div class="sc"><div class="slbl">High Risk</div><div class="sval ch">${hi}</div><div class="ssub">${hp}%</div></div>
+          <div class="sc"><div class="slbl">Medium Risk</div><div class="sval cm">${me}</div><div class="ssub">${mp}%</div></div>
+          <div class="sc"><div class="slbl">Mild Risk</div><div class="sval cl">${mi}</div><div class="ssub">${lp}%</div></div>
+          <div class="sc"><div class="slbl">Unique Diseases</div><div class="sval cp">${uq}</div><div class="ssub">Identified</div></div>
+          <div class="sc"><div class="slbl">Today</div><div class="sval ca">${tdc}</div><div class="ssub">${today}</div></div>
+          <div class="sc"><div class="slbl">Top Condition</div><div class="sval ca" style="font-size:0.8rem;margin-top:5px;line-height:1.2">${t0[0]}</div><div class="ssub">${t0[1]} reports</div></div>
+          <div class="sc"><div class="slbl">Avg / Day</div><div class="sval ca">${avg}</div><div class="ssub">Active days</div></div>
+          <div class="sc"><div class="slbl">Trend</div><div class="sval ca" style="font-size:0.95rem">${trend}</div><div class="ssub">Day over day</div></div>
+          <div class="sc"><div class="slbl">Peak Day</div><div class="sval cm" style="font-size:1.2rem">${pkd[1]}</div><div class="ssub">${pkd[0]}</div></div>
+          <div class="sc"><div class="slbl">Peak Month</div><div class="sval cp" style="font-size:1.2rem">${pkm[1]}</div><div class="ssub">${pkm[0]}</div></div>
+          <div class="sc"><div class="slbl">Safe Cases</div><div class="sval cl">${mi+me}</div><div class="ssub">Mild + Medium</div></div>
+          <div class="sc"><div class="slbl">Emergency %</div><div class="sval ch">${hp}%</div><div class="ssub">High severity</div></div>
+          <div class="sc"><div class="slbl">Non-Emergency</div><div class="sval cl">${100-hp}%</div><div class="ssub">Manageable</div></div>
+          <div class="sc"><div class="slbl">Active Months</div><div class="sval cp">${mon.length}</div><div class="ssub">With data</div></div>
+          <div class="sc"><div class="slbl">Active Days</div><div class="sval ca">${day.length}</div><div class="ssub">With data</div></div>
+          <div class="sc"><div class="slbl">2nd Condition</div><div class="sval" style="font-size:0.78rem;margin-top:5px;line-height:1.2">${top[1]?.[0]||"N/A"}</div><div class="ssub">${top[1]?.[1]||0} reports</div></div>
+          <div class="sc"><div class="slbl">3rd Condition</div><div class="sval" style="font-size:0.78rem;margin-top:5px;line-height:1.2">${top[2]?.[0]||"N/A"}</div><div class="ssub">${top[2]?.[1]||0} reports</div></div>
+        </div>
+
+        <!-- Severity bars -->
+        <div class="sevbk">
+          <div class="slabel">Severity Breakdown</div>
+          <div class="sevrow"><div class="sevname" style="color:var(--hi)">🔴 High</div><div class="sevbw"><div class="sevbar sbh" style="width:${hp}%"></div></div><div class="sevval">${hi} reports · ${hp}%</div></div>
+          <div class="sevrow"><div class="sevname" style="color:var(--me)">🟠 Medium</div><div class="sevbw"><div class="sevbar sbm" style="width:${mp}%"></div></div><div class="sevval">${me} reports · ${mp}%</div></div>
+          <div class="sevrow"><div class="sevname" style="color:var(--mi)">🟢 Mild</div><div class="sevbw"><div class="sevbar sbl" style="width:${lp}%"></div></div><div class="sevval">${mi} reports · ${lp}%</div></div>
+        </div>
+
+        <!-- Charts — canvases injected into DOM, charts rendered after paint -->
+        <div class="cgrid">
+          <div class="cc"><div class="slabel">Severity Distribution</div><div class="cbox" id="box-sev"><canvas id="c-sev"></canvas></div></div>
+          <div class="cc"><div class="slabel">Top Conditions</div><div class="cbox" id="box-cond"><canvas id="c-cond"></canvas></div></div>
+        </div>
+        <div class="cgrid">
+          <div class="cc"><div class="slabel">Daily Reports</div><div class="cbox" id="box-daily"><canvas id="c-daily"></canvas></div></div>
+          <div class="cc"><div class="slabel">Monthly Trend</div><div class="cbox" id="box-mon"><canvas id="c-mon"></canvas></div></div>
+        </div>
+        <div class="ccf"><div class="slabel">Risk Profile Radar</div><div class="cboxf" id="box-radar"><canvas id="c-radar"></canvas></div></div>
+
+        <!-- Disease ranking -->
+        <div class="dtable">
+          <div class="slabel">Disease Frequency Ranking</div>
+          ${top.slice(0,10).map(([n,c],i)=>{
+            const mx=top[0]?.[1]||1,bw=Math.round(c/mx*100),rp=pct(c,tot);
+            const rc=i===0?"gld":i===1?"slv":i===2?"brz":"oth";
+            return`<div class="drow"><div class="drk ${rc}">#${i+1}</div><div class="dn">${n}</div><div class="dbw"><div class="dbf" style="width:${bw}%"></div></div><div class="dct">${c} report${c!==1?"s":""}</div><div class="dpct">${rp}%</div></div>`
+          }).join("")}
+        </div>
+
+        <!-- 6 insight cards in 3x2 -->
+        <div class="igrid">
+          <div class="icard"><div class="iico">🌡️</div><div class="itti">High-risk alerts</div><div class="idsc">${hi} report${hi!==1?"s":""} flagged high severity (${hp}%). ${hi>tot*0.3?"Unusually high.":"Within normal range."}</div></div>
+          <div class="icard"><div class="iico">📈</div><div class="itti">Growth trend</div><div class="idsc">${trend.includes("↑")?"Increasing":"Stable or declining"} day-over-day. Avg ${avg} per active day.</div></div>
+          <div class="icard"><div class="iico">🦠</div><div class="itti">Top condition</div><div class="idsc">"${t0[0]}" leads with ${t0[1]} report${t0[1]!==1?"s":""} — ${pct(t0[1],tot)}% of analyses.</div></div>
+          <div class="icard"><div class="iico">🗓️</div><div class="itti">Peak activity</div><div class="idsc">Highest: ${pkd[1]} reports on ${pkd[0]}. Most active month: ${pkm[0]}.</div></div>
+          <div class="icard"><div class="iico">🔬</div><div class="itti">Disease diversity</div><div class="idsc">${uq} unique condition${uq!==1?"s":""} across all reports.</div></div>
+          <div class="icard"><div class="iico">✅</div><div class="itti">Non-emergency rate</div><div class="idsc">${100-hp}% of cases mild/medium — manageable with home care.</div></div>
+        </div>`;
+
+      // NOW render charts — after DOM is fully painted
+      // Double rAF ensures browser has laid out the containers
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        Chart.defaults.color = "#7a8499";
+        Chart.defaults.borderColor = "rgba(255,255,255,0.05)";
+
+        const sc = {
+          x: { ticks:{color:"#7a8499",font:{size:10},maxRotation:35}, grid:{color:"rgba(255,255,255,0.04)"} },
+          y: { ticks:{color:"#7a8499",stepSize:1}, grid:{color:"rgba(255,255,255,0.04)"}, min:0 }
+        };
+
+        mc("c-sev", {
+          type: "doughnut",
+          data: { labels:["High","Medium","Mild"], datasets:[{ data:[hi,me,mi], backgroundColor:["#ef4444","#f97316","#22c55e"], borderWidth:0, hoverOffset:8 }] },
+          options: { responsive:true, maintainAspectRatio:false, cutout:"62%", plugins:{ legend:{ position:"bottom", labels:{color:"#7a8499",padding:14,font:{size:11}} } } }
+        });
+
+        mc("c-cond", {
+          type: "bar",
+          data: {
+            labels: top.slice(0,8).map(c => c[0].length>13 ? c[0].slice(0,13)+"…" : c[0]),
+            datasets: [{ label:"Reports", data:top.slice(0,8).map(c=>c[1]), backgroundColor:"rgba(79,200,255,0.75)", borderRadius:6, borderSkipped:false }]
+          },
+          options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:sc }
+        });
+
+        mc("c-daily", {
+          type: "line",
+          data: {
+            labels: day.map(d => d[0].slice(5)),
+            datasets: [{ label:"Reports", data:day.map(d=>d[1]), borderColor:"#4fc8ff", backgroundColor:"rgba(79,200,255,0.08)", fill:true, tension:0.4, pointRadius:day.length<=15?4:2, pointBackgroundColor:"#4fc8ff" }]
+          },
+          options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:sc }
+        });
+
+        mc("c-mon", {
+          type: "bar",
+          data: {
+            labels: mon.map(m => m[0]),
+            datasets: [{ label:"Reports", data:mon.map(m=>m[1]), backgroundColor:"rgba(123,94,167,0.82)", borderRadius:6, borderSkipped:false }]
+          },
+          options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:sc }
+        });
+
+        mc("c-radar", {
+          type: "radar",
+          data: {
+            labels: ["High Risk","Medium Risk","Mild Cases","Diversity","Daily Vol","Total Scale"],
+            datasets: [{ label:"Profile", data:[Math.min(hp,100),Math.min(mp,100),Math.min(lp,100),Math.min(uq*5,100),Math.min(parseFloat(avg)*20,100),Math.min(tot*5,100)], backgroundColor:"rgba(79,200,255,0.12)", borderColor:"#4fc8ff", pointBackgroundColor:"#4fc8ff", pointRadius:4 }]
+          },
+          options: {
+            responsive:true, maintainAspectRatio:false,
+            plugins:{ legend:{display:false} },
+            scales:{ r:{ min:0, max:100, ticks:{color:"#7a8499",font:{size:9},stepSize:25,backdropColor:"transparent"}, grid:{color:"rgba(255,255,255,0.07)"}, pointLabels:{color:"#7a8499",font:{size:10}} } }
+          }
+        });
+      }));
+    }
+
+    load();
+  </script>
+</body>
+</html>

@@ -1,0 +1,122 @@
+[
+  {
+    "condition": "Common Cold",
+    "symptoms": ["runny nose", "sneezing", "sore throat", "mild fever", "cough", "nasal congestion"],
+    "description": "The common cold is a viral infection of the upper respiratory tract caused by rhinoviruses. Symptoms include runny nose, sneezing, sore throat, mild cough, and low-grade fever. It is self-limiting and usually resolves within 7-10 days.",
+    "source": "MedlinePlus"
+  },
+  {
+    "condition": "Influenza (Flu)",
+    "symptoms": ["high fever", "body aches", "fatigue", "cough", "headache", "chills", "sore throat"],
+    "description": "Influenza is a contagious respiratory illness caused by influenza viruses. Unlike the common cold, flu symptoms appear suddenly and include high fever, severe body aches, fatigue, headache, and dry cough. Can lead to serious complications in vulnerable populations.",
+    "source": "WHO"
+  },
+  {
+    "condition": "Dengue Fever",
+    "symptoms": ["high fever", "joint pain", "rash", "eye pain", "headache", "muscle pain", "nausea"],
+    "description": "Dengue is a mosquito-borne viral infection causing sudden high fever, severe headache, pain behind eyes, joint and muscle pain, rash, and nausea. Severe dengue can cause bleeding, organ impairment, and plasma leakage.",
+    "source": "WHO"
+  },
+  {
+    "condition": "COVID-19",
+    "symptoms": ["fever", "dry cough", "fatigue", "loss of taste", "loss of smell", "shortness of breath", "body aches"],
+    "description": "COVID-19 is caused by the SARS-CoV-2 coronavirus. Common symptoms include fever, dry cough, fatigue, loss of taste or smell, and shortness of breath. Severity ranges from mild to critical. Isolation and vaccination are key preventive measures.",
+    "source": "WHO"
+  },
+  {
+    "condition": "Malaria",
+    "symptoms": ["high fever", "chills", "sweating", "headache", "nausea", "vomiting", "muscle pain"],
+    "description": "Malaria is a parasitic infection transmitted by Anopheles mosquitoes. It causes cyclical high fever with chills, sweating, headache, nausea, and muscle pain. Severe malaria can cause organ failure and is a medical emergency.",
+    "source": "WHO"
+  },
+  {
+    "condition": "Typhoid Fever",
+    "symptoms": ["prolonged fever", "abdominal pain", "headache", "weakness", "constipation", "diarrhea", "rash"],
+    "description": "Typhoid is caused by Salmonella typhi bacteria. Symptoms include sustained high fever, abdominal pain, headache, weakness, and sometimes rose-colored spots on the chest. Spread through contaminated food and water.",
+    "source": "CDC"
+  },
+  {
+    "condition": "Gastroenteritis",
+    "symptoms": ["nausea", "vomiting", "diarrhea", "stomach cramps", "fever", "dehydration"],
+    "description": "Gastroenteritis is inflammation of the stomach and intestines, usually from viral or bacterial infection. Symptoms include nausea, vomiting, diarrhea, stomach cramps, and sometimes low fever. Oral rehydration is the main treatment.",
+    "source": "MedlinePlus"
+  },
+  {
+    "condition": "Urinary Tract Infection (UTI)",
+    "symptoms": ["burning urination", "frequent urination", "cloudy urine", "lower abdominal pain", "blood in urine"],
+    "description": "UTIs are bacterial infections of the urinary system. Symptoms include painful or burning urination, frequent urges to urinate, cloudy or bloody urine, and pelvic pain. Women are more commonly affected. Antibiotics are the standard treatment.",
+    "source": "MedlinePlus"
+  },
+  {
+    "condition": "Migraine",
+    "symptoms": ["severe headache", "nausea", "light sensitivity", "sound sensitivity", "vision changes", "throbbing head pain"],
+    "description": "Migraines are intense recurring headaches often accompanied by nausea, vomiting, and extreme sensitivity to light and sound. Pain is usually on one side and can last hours to days. Triggers include stress, hormonal changes, and certain foods.",
+    "source": "Mayo Clinic"
+  },
+  {
+    "condition": "Hypertension (High Blood Pressure)",
+    "symptoms": ["headache", "dizziness", "chest pain", "shortness of breath", "blurred vision", "nosebleed"],
+    "description": "Hypertension is persistently elevated blood pressure above 130/80 mmHg. Often called the silent killer as it has no obvious symptoms. When symptomatic, may cause headache, dizziness, chest pain, or shortness of breath. Increases risk of heart attack and stroke.",
+    "source": "WHO"
+  },
+  {
+    "condition": "Diabetes (Type 2)",
+    "symptoms": ["frequent urination", "excessive thirst", "fatigue", "blurred vision", "slow wound healing", "weight loss"],
+    "description": "Type 2 diabetes occurs when the body cannot use insulin effectively. Symptoms include increased thirst, frequent urination, fatigue, blurred vision, and slow-healing wounds. Long-term complications include kidney disease, nerve damage, and cardiovascular disease.",
+    "source": "WHO"
+  },
+  {
+    "condition": "Anemia",
+    "symptoms": ["fatigue", "weakness", "pale skin", "shortness of breath", "dizziness", "cold hands and feet", "headache"],
+    "description": "Anemia is a condition where the blood lacks enough healthy red blood cells. Common symptoms include fatigue, weakness, pale skin, shortness of breath, dizziness, and cold extremities. Iron deficiency is the most common cause globally.",
+    "source": "MedlinePlus"
+  },
+  {
+    "condition": "Asthma",
+    "symptoms": ["wheezing", "shortness of breath", "chest tightness", "cough", "difficulty breathing", "breathlessness at night"],
+    "description": "Asthma is a chronic respiratory condition causing airway inflammation and narrowing. Symptoms include wheezing, shortness of breath, chest tightness, and cough — especially at night or early morning. Triggers include allergens, exercise, cold air, and smoke.",
+    "source": "WHO"
+  },
+  {
+    "condition": "Chickenpox (Varicella)",
+    "symptoms": ["itchy rash", "blisters", "fever", "fatigue", "loss of appetite", "headache"],
+    "description": "Chickenpox is a highly contagious viral infection causing an itchy blister-like rash, fever, fatigue, and loss of appetite. The rash appears in waves over the entire body. Vaccination is the most effective prevention.",
+    "source": "CDC"
+  },
+  {
+    "condition": "Pneumonia",
+    "symptoms": ["cough with phlegm", "fever", "chills", "shortness of breath", "chest pain", "fatigue", "nausea"],
+    "description": "Pneumonia is an infection that inflames air sacs in one or both lungs. Symptoms include cough with phlegm or pus, fever, chills, and difficulty breathing. It can be caused by bacteria, viruses, or fungi. Severity ranges from mild to life-threatening.",
+    "source": "WHO"
+  },
+  {
+    "condition": "Acid Reflux / GERD",
+    "symptoms": ["heartburn", "chest burning", "regurgitation", "sour taste", "difficulty swallowing", "chronic cough"],
+    "description": "GERD occurs when stomach acid frequently flows back into the esophagus. Main symptom is heartburn — a burning sensation in the chest. Other symptoms include regurgitation of food, sour taste, and difficulty swallowing. Lifestyle changes and antacids help manage symptoms.",
+    "source": "Mayo Clinic"
+  },
+  {
+    "condition": "Appendicitis",
+    "symptoms": ["severe abdominal pain", "pain around navel", "nausea", "vomiting", "fever", "loss of appetite"],
+    "description": "Appendicitis is inflammation of the appendix, a medical emergency. Pain typically starts around the navel and shifts to the lower right abdomen. Accompanied by nausea, vomiting, fever, and loss of appetite. Requires immediate surgical removal.",
+    "source": "MedlinePlus"
+  },
+  {
+    "condition": "Depression",
+    "symptoms": ["persistent sadness", "loss of interest", "fatigue", "sleep changes", "appetite changes", "difficulty concentrating", "hopelessness"],
+    "description": "Depression is a mood disorder causing persistent sadness and loss of interest. Symptoms include fatigue, changes in sleep and appetite, difficulty concentrating, and feelings of hopelessness. It significantly affects daily functioning and requires professional treatment.",
+    "source": "WHO"
+  },
+  {
+    "condition": "Anxiety Disorder",
+    "symptoms": ["excessive worry", "restlessness", "rapid heartbeat", "sweating", "trembling", "shortness of breath", "insomnia"],
+    "description": "Anxiety disorders involve excessive fear or worry that is difficult to control. Physical symptoms include rapid heartbeat, sweating, trembling, and shortness of breath. Can interfere significantly with daily activities. Treatment includes therapy and medication.",
+    "source": "WHO"
+  },
+  {
+    "condition": "Kidney Stones",
+    "symptoms": ["severe back pain", "side pain", "painful urination", "blood in urine", "nausea", "vomiting", "frequent urination"],
+    "description": "Kidney stones are hard mineral deposits formed in the kidneys. They cause severe pain in the back, side, or lower abdomen, painful urination, blood in urine, and nausea. Small stones may pass on their own; larger ones may require medical treatment.",
+    "source": "Mayo Clinic"
+  }
+]

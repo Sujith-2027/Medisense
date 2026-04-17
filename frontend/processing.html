@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MediSense — Analyzing...</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#0b0f1a;--sur:#131929;--bdr:rgba(255,255,255,0.07);--acc:#4fc8ff;--acc2:#7b5ea7;--tx:#e8edf5;--mu:#7a8499}
+    body{background:var(--bg);color:var(--tx);font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:28px;padding:20px}
+    .orb{position:fixed;border-radius:50%;filter:blur(120px);opacity:0.18;pointer-events:none}
+    .orb1{width:400px;height:400px;background:var(--acc);top:-100px;left:-100px;animation:pulse 3s ease-in-out infinite alternate}
+    .orb2{width:350px;height:350px;background:var(--acc2);bottom:-80px;right:-80px;animation:pulse 3s 1.5s ease-in-out infinite alternate}
+    @keyframes pulse{from{opacity:0.14}to{opacity:0.26}}
+    .spin-wrap{position:relative;width:88px;height:88px}
+    .ring{position:absolute;inset:0;border-radius:50%;border:2px solid transparent}
+    .r1{border-top-color:var(--acc);animation:spin 1.2s linear infinite}
+    .r2{border-right-color:var(--acc2);animation:spin 1.8s linear infinite reverse;inset:10px}
+    .r3{border-bottom-color:rgba(79,200,255,0.35);animation:spin 2.5s linear infinite;inset:20px}
+    .ric{position:absolute;inset:33px;font-size:1.3rem;display:flex;align-items:center;justify-content:center}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    h2{font-family:'Playfair Display',serif;font-size:1.6rem}
+    .status{color:var(--mu);font-size:0.9rem;font-weight:300;min-height:22px}
+    .steps{display:flex;flex-direction:column;gap:10px;background:var(--sur);border:1px solid var(--bdr);border-radius:15px;padding:20px 28px;min-width:min(310px,90vw);text-align:left}
+    .step{display:flex;align-items:center;gap:11px;font-size:0.84rem;color:var(--mu);transition:color 0.4s}
+    .step.active{color:var(--tx)}.step.done{color:#4caf82}
+    .dot{width:7px;height:7px;border-radius:50%;background:var(--bdr);flex-shrink:0;transition:background 0.4s}
+    .step.active .dot{background:var(--acc);box-shadow:0 0 7px var(--acc);animation:blink 1s ease-in-out infinite}
+    .step.done .dot{background:#4caf82}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+    .back-link{color:var(--mu);font-size:0.8rem;text-decoration:none;margin-top:4px}
+    .back-link:hover{color:var(--tx)}
+  </style>
+</head>
+<body>
+  <div class="orb orb1"></div><div class="orb orb2"></div>
+  <div class="spin-wrap"><div class="ring r1"></div><div class="ring r2"></div><div class="ring r3"></div><div class="ric">🔬</div></div>
+  <div><h2>Analyzing your symptoms</h2><p class="status" id="status">Preparing your data...</p></div>
+  <div class="steps">
+    <div class="step" id="s1"><div class="dot"></div>Reading symptoms & medical history</div>
+    <div class="step" id="s2"><div class="dot"></div>Retrieving medical knowledge (RAG)</div>
+    <div class="step" id="s3"><div class="dot"></div>Running AI analysis via Groq</div>
+    <div class="step" id="s4"><div class="dot"></div>Applying safety & allergy checks</div>
+    <div class="step" id="s5"><div class="dot"></div>Building PDF report</div>
+  </div>
+  <a class="back-link" href="upload.html">← Go back and edit</a>
+  <script>
+    const data=JSON.parse(sessionStorage.getItem("symptomData")||"{}");
+    if(!data.symptoms){window.location.href="upload.html"}
+    const ids=["s1","s2","s3","s4","s5"];
+    function setA(i){if(i>0)document.getElementById(ids[i-1]).className="step done";if(i<ids.length)document.getElementById(ids[i]).className="step active"}
+    setA(0);
+    const ts=[setTimeout(()=>setA(1),1000),setTimeout(()=>setA(2),2100),setTimeout(()=>setA(3),3300),setTimeout(()=>setA(4),4500)];
+    fetch("/api/analyze",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)})
+    .then(r=>{if(!r.ok)throw new Error("API error "+r.status);return r.json()})
+    .then(result=>{
+      ts.forEach(clearTimeout);
+      ids.forEach(id=>document.getElementById(id).className="step done");
+      document.getElementById("status").textContent="Complete! Redirecting...";
+      sessionStorage.setItem("analysisResult",JSON.stringify({...data,...result}));
+      setTimeout(()=>window.location.href="result.html",700);
+    })
+    .catch(err=>{document.getElementById("status").textContent="Error: "+err.message+". Redirecting back...";setTimeout(()=>window.location.href="upload.html",2500)});
+  </script>
+</body>
+</html>
