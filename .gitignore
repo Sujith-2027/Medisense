@@ -1,7 +1,4 @@
 __pycache__/
 *.pyc
 .env
-data.db
 reports/
-db/chunks.pkl
-db/faiss_index.*
