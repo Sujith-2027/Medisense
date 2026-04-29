@@ -1,5 +1,6 @@
 import uuid
 import os
+import io
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, HRFlowable
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
@@ -8,15 +9,10 @@ from reportlab.lib.units import mm
 REPORT_DIR = "reports"
 os.makedirs(REPORT_DIR, exist_ok=True)
 
-def create_report(data: dict) -> tuple[str, str]:
+def create_report(data: dict):
     report_id = str(uuid.uuid4())[:8].upper()
     file_path = f"{REPORT_DIR}/{report_id}.pdf"
 
-    doc = SimpleDocTemplate(
-        file_path,
-        rightMargin=20 * mm, leftMargin=20 * mm,
-        topMargin=20 * mm,   bottomMargin=20 * mm,
-    )
     styles = getSampleStyleSheet()
     heading = ParagraphStyle("heading", parent=styles["Heading2"], textColor=colors.HexColor("#1a73e8"))
     normal  = styles["Normal"]
@@ -29,39 +25,32 @@ def create_report(data: dict) -> tuple[str, str]:
     sev_style = ParagraphStyle("sev", parent=bold, textColor=sev_color)
 
     content = []
-
     content.append(Paragraph("MediSense AI — Symptom Report", styles["Title"]))
     content.append(Spacer(1, 4 * mm))
     content.append(HRFlowable(width="100%", thickness=1, color=colors.lightgrey))
     content.append(Spacer(1, 4 * mm))
-
     content.append(Paragraph(f"Report ID: {report_id}", bold))
     content.append(Paragraph(f"Patient: {data.get('name', 'N/A')}", normal))
     content.append(Paragraph(f"Age: {data.get('age', 'N/A')}   Gender: {data.get('gender', 'N/A')}", normal))
     content.append(Paragraph(f"Symptoms: {data.get('symptoms', 'N/A')}", normal))
     content.append(Paragraph(f"Severity: {sev.upper()}", sev_style))
     content.append(Spacer(1, 4 * mm))
-
     content.append(Paragraph("Possible Conditions", heading))
     for c in data.get("possible_conditions", []):
         content.append(Paragraph(f"• {c}", normal))
     content.append(Spacer(1, 3 * mm))
-
     content.append(Paragraph("Explanation", heading))
     content.append(Paragraph(data.get("explanation", ""), normal))
     content.append(Spacer(1, 3 * mm))
-
     content.append(Paragraph("Advice", heading))
     for a in data.get("advice", []):
         content.append(Paragraph(f"• {a}", normal))
     content.append(Spacer(1, 3 * mm))
-
     if data.get("otc"):
         content.append(Paragraph("OTC Medicines", heading))
         for m in data["otc"]:
             content.append(Paragraph(f"• {m}", normal))
         content.append(Spacer(1, 3 * mm))
-
     if data.get("warning"):
         warn_style = ParagraphStyle("warn", parent=heading, textColor=colors.red)
         content.append(Paragraph("Warnings", warn_style))
@@ -76,5 +65,12 @@ def create_report(data: dict) -> tuple[str, str]:
         small
     ))
 
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(buffer, rightMargin=20*mm, leftMargin=20*mm, topMargin=20*mm, bottomMargin=20*mm)
     doc.build(content)
-    return report_id, file_path
+    pdf_bytes = buffer.getvalue()
+
+    with open(file_path, "wb") as f:
+        f.write(pdf_bytes)
+
+    return report_id, file_path, pdf_bytes
