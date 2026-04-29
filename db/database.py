@@ -15,6 +15,7 @@ def init_db():
                 symptoms        TEXT,
                 severity        TEXT,
                 result          TEXT,
+                pdf_data        BLOB,
                 medical_history TEXT DEFAULT '',
                 allergies       TEXT DEFAULT '',
                 created_at      DATETIME DEFAULT CURRENT_TIMESTAMP
