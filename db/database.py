@@ -33,13 +33,13 @@ def init_db():
         conn.commit()
 
 def save_report(report_id: str, name: str, symptoms: str, severity: str,
-                result: str, medical_history: str = "", allergies: str = ""):
+                result: str, medical_history: str = "", allergies: str = "", pdf_data: bytes = b""):
     with get_conn() as conn:
         conn.execute(
             """INSERT INTO reports
-               (id, name, symptoms, severity, result, medical_history, allergies)
-               VALUES (?,?,?,?,?,?,?)""",
-            (report_id, name, symptoms, severity, result, medical_history, allergies),
+               (id, name, symptoms, severity, result, medical_history, allergies, pdf_data)
+               VALUES (?,?,?,?,?,?,?,?)""",
+            (report_id, name, symptoms, severity, result, medical_history, allergies, pdf_data),
         )
         conn.commit()
 
