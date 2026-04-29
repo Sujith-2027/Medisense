@@ -1,8 +1,7 @@
 import json
 from fastapi import APIRouter, HTTPException
-from fastapi.responses import FileResponse
+from fastapi.responses import Response
 from pydantic import BaseModel
-
 from rag.pipeline import run_rag_pipeline
 from rag.generator import explain_medicine
 from safety.severity import classify_severity
@@ -33,24 +32,27 @@ def analyze(req: SymptomRequest):
         medical_history=req.medical_history,
         allergies=req.allergies,
     )
-    report_id, _ = create_report({
+    report_id, _, pdf_bytes = create_report({
         "name": req.name, "age": req.age, "gender": req.gender,
         "symptoms": req.symptoms, "severity": severity_level,
         "medical_history": req.medical_history, "allergies": req.allergies,
         **result,
     })
     save_report(report_id, req.name, req.symptoms, severity_level,
-                json.dumps(result), req.medical_history, req.allergies)
+                json.dumps(result), req.medical_history, req.allergies, pdf_bytes)
     return {"report_id": report_id, "severity": severity_level, "severity_color": severity_color, **result}
 
 @router.get("/report/{report_id}")
 def download_report(report_id: str):
-    path = f"reports/{report_id}.pdf"
-    return FileResponse(path, media_type="application/pdf", filename=f"MediSense_Report_{report_id}.pdf")
+    row = get_by_id(report_id.upper()) or get_by_id(report_id)
+    if not row or not row[-1]:
+        raise HTTPException(status_code=404, detail="Report not found")
+    return Response(row[-1], media_type="application/pdf", headers={
+        "Content-Disposition": f"attachment; filename=MediSense_Report_{report_id}.pdf"
+    })
 
 @router.get("/fetch-report/{report_id}")
 def fetch_report_data(report_id: str):
-    # Try both upper and as-is
     row = get_by_id(report_id.upper()) or get_by_id(report_id)
     if not row:
         raise HTTPException(status_code=404, detail="Report not found")
